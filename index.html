@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover"/>
+<title>MediCare – Patient Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+:root{
+  --teal:#0B6E6E;--teal-mid:#0D8C8C;--teal-bright:#11B5B5;--teal-glow:rgba(11,110,110,0.18);
+  --amber:#E8820C;--amber-light:#F5A623;--amber-pale:#FEF3E2;
+  --coral:#E84545;--mint:#00C896;--sky:#2196F3;
+  --bg:#F7F9FC;--white:#FFFFFF;
+  --navy:#0A1A2E;--navy-mid:#122038;
+  --text:#0F1E2E;--text-mid:#3D5166;--text-soft:#7A8FA6;--text-faint:#B0C0D0;
+  --border:#E2EBF3;--border-mid:#C8D8E8;
+  --card:#FFFFFF;--card-hover:#F0F7FF;
+  --shadow-sm:0 2px 8px rgba(11,110,110,0.08);
+  --shadow:0 6px 24px rgba(11,110,110,0.12);
+  --shadow-lg:0 16px 48px rgba(11,110,110,0.18);
+  --r:14px;--r-sm:8px;--r-lg:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif}
+button{cursor:pointer;font-family:'Instrument Sans',sans-serif}
+input,select,textarea{font-family:'Instrument Sans',sans-serif}
+
+/* ── NAVBAR ── */
+.nav{position:fixed;top:0;width:100%;z-index:900;transition:all .3s}
+.nav.scrolled{background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);box-shadow:0 1px 0 var(--border)}
+.nav-inner{max-width:1240px;margin:0 auto;padding:0 28px;height:72px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-mark{width:42px;height:42px;background:linear-gradient(135deg,var(--teal),var(--teal-bright));border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;box-shadow:0 4px 12px var(--teal-glow)}
+.logo-text{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
+.logo-text span{color:var(--teal-mid)}
+.logo-text b{color:var(--amber)}
+.nav-links{display:flex;gap:4px}
+.nav-a{padding:8px 16px;border-radius:100px;font-size:14px;font-weight:600;color:var(--text-mid);transition:all .2s;border:none;background:none;cursor:pointer}
+.nav-a:hover{color:var(--teal);background:rgba(11,110,110,0.07)}
+.nav-a.active-link{color:var(--teal);background:rgba(11,110,110,0.1)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.notif-wrap{position:relative}
+.notif-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--border-mid);background:var(--white);color:var(--text-mid);font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.notif-btn:hover{border-color:var(--teal-bright);color:var(--teal)}
+.notif-dot{position:absolute;top:1px;right:1px;width:16px;height:16px;background:var(--coral);border-radius:50%;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--white)}
+.btn-login{padding:9px 20px;border-radius:100px;border:2px solid var(--teal);color:var(--teal);background:transparent;font-size:14px;font-weight:700;transition:all .2s}
+.btn-login:hover{background:var(--teal);color:#fff}
+.btn-cta{padding:9px 22px;border-radius:100px;border:none;background:linear-gradient(135deg,var(--teal),var(--teal-bright));color:#fff;font-size:14px;font-weight:700;transition:all .2s;box-shadow:0 4px 12px var(--teal-glow)}
+.btn-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px var(--teal-glow)}
+.user-chip-wrap{position:relative}
+.user-chip{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:100px;border:2px solid var(--border-mid);background:var(--white);cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.user-chip:hover,.user-chip:active{border-color:var(--teal-mid);background:#F0F9F9}
+.user-chip-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--amber));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0}
+.user-chip span{font-size:13px;font-weight:600;color:var(--text-mid)}
+.user-chip .chip-arrow{font-size:9px;color:var(--text-soft);margin-left:2px;transition:transform .2s}
+.user-chip.open .chip-arrow{transform:rotate(180deg)}
+/* Dropdown */
+.user-dropdown{
+  position:absolute;top:calc(100% + 10px);right:0;
+  background:var(--white);border:1.5px solid var(--border);border-radius:16px;
+  box-shadow:0 8px 32px rgba(11,110,110,0.15);
+  min-width:200px;overflow:hidden;z-index:1100;
+  display:none;animation:dropIn .18s ease;
+}
+.user-dropdown.open{display:block}
+@keyframes dropIn{from{opacity:0;transform:translateY(-8px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ud-info{padding:16px 16px 12px;border-bottom:1px solid var(--border)}
+.ud-name{font-size:14px;font-weight:800;color:var(--text);font-family:'Syne',sans-serif}
+.ud-email{font-size:11px;color:var(--text-soft);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ud-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;-webkit-tap-highlight-color:transparent}
+.ud-item:hover,.ud-item:active{background:var(--bg)}
+.ud-item i{width:16px;text-align:center;font-size:13px}
+.ud-item.logout{color:var(--coral)}
+.ud-item.logout:hover,.ud-item.logout:active{background:rgba(232,69,69,0.06)}
+.ud-divider{height:1px;background:var(--border);margin:2px 0}
+.user-chip span{font-size:13px;font-weight:600;color:var(--text-mid)}
+
+/* ── NOTIFICATION PANEL ── */
+.notif-panel{position:fixed;top:70px;right:24px;width:370px;max-height:500px;background:var(--white);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);z-index:1000;display:none;flex-direction:column;overflow:hidden;border:1px solid var(--border)}
+.notif-panel.open{display:flex;animation:popIn .2s ease}
+.np-head{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.np-head h3{font-size:15px;font-weight:700;font-family:'Syne',sans-serif;color:var(--text)}
+.np-read-all{font-size:12px;font-weight:700;color:var(--teal);background:none;border:none;cursor:pointer}
+.np-list{overflow-y:auto;flex:1;max-height:400px}
+.np-item{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;gap:12px;cursor:pointer;transition:background .15s}
+.np-item:hover{background:var(--bg)}
+.np-item.unread{background:linear-gradient(90deg,rgba(11,110,110,0.04),transparent)}
+.np-item:last-child{border-bottom:none}
+.np-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.np-icon.booking{background:#E8F8F3;color:var(--mint)}
+.np-icon.appointment_update{background:#E8F3FB;color:var(--sky)}
+.np-icon.announcement{background:var(--amber-pale);color:var(--amber)}
+.np-icon.offer{background:#FDE8F8;color:#C026D3}
+.np-text .title{font-size:13px;font-weight:700;margin-bottom:3px;color:var(--text)}
+.np-text .msg{font-size:12px;color:var(--text-soft);line-height:1.5}
+.np-text .time{font-size:11px;color:var(--text-faint);margin-top:4px}
+.np-empty{padding:48px 20px;text-align:center;color:var(--text-soft)}
+.np-empty i{font-size:36px;margin-bottom:10px;opacity:0.25;display:block}
+
+/* ── HERO ── */
+.hero{min-height:100vh;background:var(--navy);position:relative;display:flex;align-items:center;padding-top:72px;overflow:hidden;-webkit-overflow-scrolling:touch}
+.hero-mesh{position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 80% 40%,rgba(17,181,181,0.18) 0%,transparent 60%),radial-gradient(ellipse 40% 50% at 10% 80%,rgba(232,130,12,0.12) 0%,transparent 50%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);background-size:48px 48px}
+.hero-inner{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:60px 28px 80px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(17,181,181,0.35);background:rgba(17,181,181,0.08);padding:7px 16px;border-radius:100px;margin-bottom:24px}
+.hero-eyebrow .pulse{width:8px;height:8px;background:var(--teal-bright);border-radius:50%;animation:pulse 2s infinite}
+.hero-eyebrow span{font-size:12px;font-weight:700;color:var(--teal-bright);letter-spacing:0.5px;text-transform:uppercase}
+.hero h1{font-size:56px;font-weight:800;line-height:1.1;color:#fff;margin-bottom:22px;letter-spacing:-1px}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--teal-bright),var(--amber-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-desc{font-size:17px;color:rgba(255,255,255,0.62);line-height:1.75;margin-bottom:36px;font-weight:400}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:48px}
+.btn-hero{padding:15px 30px;border-radius:100px;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:10px;transition:all .3s;border:none}
+.btn-hero.primary{background:linear-gradient(135deg,var(--teal),var(--teal-bright));color:#fff;box-shadow:0 8px 24px rgba(11,110,110,0.35)}
+.btn-hero.primary:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(11,110,110,0.45)}
+.btn-hero.sec{background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:#fff}
+.btn-hero.sec:hover{background:rgba(255,255,255,0.15)}
+.hero-metrics{display:flex;gap:36px}
+.hm{border-left:2px solid rgba(255,255,255,0.12);padding-left:20px}
+.hm-num{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;color:var(--teal-bright)}
+.hm-label{font-size:12px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px}
+/* Hero right card */
+.hero-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:28px;position:relative}
+.hero-card::before{content:'';position:absolute;inset:-1px;border-radius:24px;background:linear-gradient(135deg,rgba(17,181,181,0.3),transparent,rgba(232,130,12,0.2));mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;pointer-events:none}
+.hc-title{font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.spec-chip{background:rgba(255,255,255,0.055);border:1px solid rgba(255,255,255,0.09);border-radius:10px;padding:13px 14px;display:flex;align-items:center;gap:10px;transition:all .2s;cursor:pointer}
+.spec-chip:hover{background:rgba(17,181,181,0.12);border-color:rgba(17,181,181,0.3);transform:translateX(2px)}
+.spec-chip .si{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.spec-chip .sn{font-size:13px;color:rgba(255,255,255,0.82);font-weight:600}
+.hc-ai{margin-top:16px;background:linear-gradient(135deg,rgba(11,110,110,0.25),rgba(17,181,181,0.15));border:1px solid rgba(17,181,181,0.25);border-radius:12px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.hc-ai .ai-ic{width:34px;height:34px;background:linear-gradient(135deg,var(--teal),var(--teal-bright));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hc-ai p{font-size:12px;color:rgba(255,255,255,0.6);line-height:1.6}
+.hc-ai p strong{color:var(--teal-bright)}
+
+/* ── OFFERS STRIP ── */
+.offers-strip{background:linear-gradient(90deg,var(--navy-mid),#0D3D3D,var(--navy-mid));padding:48px 28px;overflow:hidden}
+.os-inner{max-width:1240px;margin:0 auto}
+.os-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.os-head h2{font-size:22px;color:#fff;font-weight:800;display:flex;align-items:center;gap:10px}
+.os-head h2 i{color:var(--amber-light)}
+.offers-scroll{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.offers-scroll::-webkit-scrollbar{display:none}
+.offer-card{min-width:240px;background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.1);border-radius:var(--r);padding:22px;flex-shrink:0;position:relative;overflow:hidden;transition:all .25s}
+.offer-card:hover{transform:translateY(-3px);border-color:rgba(17,181,181,0.3)}
+.offer-card::after{content:'';position:absolute;bottom:-20px;right:-20px;width:70px;height:70px;border-radius:50%;background:rgba(17,181,181,0.08)}
+.offer-tag{display:inline-block;background:var(--amber);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:100px;letter-spacing:0.5px;margin-bottom:10px}
+.offer-card h3{font-size:15px;color:#fff;font-weight:700;margin-bottom:5px;font-family:'Syne',sans-serif}
+.offer-card p{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.5}
+.offer-pct{font-size:34px;font-weight:800;font-family:'Syne',sans-serif;color:var(--teal-bright);margin-top:8px}
+
+/* ── SECTION ── */
+.section{padding:80px 28px;width:100%}
+.sec-inner{max-width:1240px;margin:0 auto}
+.sec-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+.sec-eyebrow::before{content:'';width:20px;height:2px;background:var(--teal);border-radius:2px}
+.sec-title{font-size:40px;font-weight:800;letter-spacing:-0.5px;margin-bottom:12px;line-height:1.15}
+.sec-sub{font-size:16px;color:var(--text-soft);line-height:1.7;max-width:520px}
+
+/* ── DOCTORS ── */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;margin-top:36px}
+.doc-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:26px;text-align:center;transition:all .3s;cursor:pointer;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.doc-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--teal),var(--teal-bright));transform:scaleX(0);transition:transform .3s}
+.doc-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--teal-bright)}
+.doc-card:hover::before{transform:scaleX(1)}
+.doc-av{width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-bright));display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;margin:0 auto 16px;box-shadow:0 6px 16px var(--teal-glow)}
+.doc-name{font-size:16px;font-weight:800;margin-bottom:4px;font-family:'Syne',sans-serif}
+.doc-spec{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.doc-meta{font-size:12px;color:var(--text-soft)}
+.doc-avail{display:inline-flex;align-items:center;gap:5px;margin-top:10px;font-size:12px;font-weight:700}
+.doc-avail.yes{color:var(--mint)}
+.doc-avail.no{color:var(--coral)}
+.doc-avail .d{width:7px;height:7px;border-radius:50%;background:currentColor}
+.doc-fee{font-size:13px;color:var(--text-soft);margin-top:6px}
+
+/* ── BOOKING SECTION ── */
+.booking-area{background:linear-gradient(135deg,rgba(11,110,110,0.05),rgba(17,181,181,0.03));border:1.5px solid rgba(11,110,110,0.12);border-radius:24px;padding:40px;width:100%;box-sizing:border-box}
+.dash-tabs{display:flex;gap:4px;background:var(--border);padding:4px;border-radius:12px;width:fit-content;margin-bottom:32px}
+.dtab{padding:10px 24px;border-radius:9px;font-size:14px;font-weight:700;border:none;background:none;color:var(--text-soft);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif}
+.dtab.on{background:var(--white);color:var(--teal);box-shadow:var(--shadow-sm)}
+.booking-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fg{display:flex;flex-direction:column;gap:7px}
+.fg.full{grid-column:1/-1}
+label{font-size:12px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.4px}
+input,select,textarea{padding:12px 14px;border:1.5px solid var(--border-mid);border-radius:var(--r-sm);font-size:14px;color:var(--text);background:var(--white);outline:none;transition:all .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--teal-mid);box-shadow:0 0 0 3px var(--teal-glow)}
+textarea{min-height:96px;resize:vertical;line-height:1.6}
+.submit-btn{margin-top:6px;width:100%;padding:15px;background:linear-gradient(135deg,var(--teal),var(--teal-bright));color:#fff;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .3s;font-family:'Syne',sans-serif;-webkit-tap-highlight-color:transparent}
+.submit-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px var(--teal-glow)}
+.submit-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* ── AUTH GATE ── */
+.auth-gate{text-align:center;padding:60px 20px}
+.auth-gate .lock-ic{width:72px;height:72px;background:var(--amber-pale);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;color:var(--amber)}
+.auth-gate h3{font-size:22px;font-weight:800;margin-bottom:8px}
+.auth-gate p{color:var(--text-soft);margin-bottom:24px;font-size:15px}
+
+/* ── AI BOX ── */
+.ai-box{margin-top:28px;border-radius:var(--r-lg);overflow:hidden;display:none}
+.ai-box.show{display:block;animation:fadeUp .4s ease}
+.ai-header{background:linear-gradient(135deg,var(--navy),#0D3D3D);padding:20px 24px;display:flex;align-items:center;gap:14px}
+.ai-header .ai-av{width:46px;height:46px;background:linear-gradient(135deg,var(--teal),var(--teal-bright));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.ai-header-text h3{font-size:16px;font-weight:800;color:#fff;font-family:'Syne',sans-serif}
+.ai-header-text p{font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px}
+.ai-body{background:#F0FAFA;padding:24px;border:1px solid rgba(11,110,110,0.15)}
+.ai-content{color:#0D3333;font-size:14px;line-height:1.9;white-space:pre-wrap;font-weight:400}
+.ai-content strong{color:#0B6E6E;font-weight:700;font-size:14.5px}.ai-content b{color:#0B6E6E;font-weight:700}
+.ai-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 16px;gap:0}
+.spinner{width:20px;height:20px;border:2.5px solid rgba(17,181,181,0.25);border-top-color:var(--teal-bright);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+
+/* ── HMS PULSE LOADER (AI response) ── */
+.hms-pulse-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%}
+.hms-pulse-icon{
+  width:54px;height:54px;border-radius:14px;
+  background:linear-gradient(135deg,#0B6E6E,#11B5B5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;color:#fff;
+  box-shadow:0 0 0 0 rgba(17,181,181,0.6);
+  animation:hmsPulseRing 1.4s ease-in-out infinite;
+}
+@keyframes hmsPulseRing{
+  0%{box-shadow:0 0 0 0 rgba(17,181,181,0.55)}
+  60%{box-shadow:0 0 0 18px rgba(17,181,181,0)}
+  100%{box-shadow:0 0 0 0 rgba(17,181,181,0)}
+}
+.hms-ecg-wrap{width:220px;height:40px;position:relative}
+.hms-ecg-wrap svg{width:100%;height:100%;overflow:visible}
+.hms-ecg-line{
+  fill:none;stroke:#11B5B5;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:280;stroke-dashoffset:280;
+  animation:hmsEcgDraw 1.6s ease-in-out infinite;
+  filter:drop-shadow(0 0 5px rgba(17,181,181,0.85));
+}
+@keyframes hmsEcgDraw{
+  0%  {stroke-dashoffset:280;opacity:1}
+  65% {stroke-dashoffset:0;opacity:1}
+  85% {stroke-dashoffset:0;opacity:0}
+  100%{stroke-dashoffset:280;opacity:0}
+}
+.hms-loading-text{font-size:13px;font-weight:600;color:#0B6E6E;letter-spacing:0.3px}
+.hms-loading-dots span{
+  display:inline-block;width:5px;height:5px;border-radius:50%;
+  background:#11B5B5;margin:0 2px;
+  animation:hmsDot 1s ease-in-out infinite;
+}
+.hms-loading-dots span:nth-child(2){animation-delay:.2s}
+.hms-loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes hmsDot{0%,80%,100%{transform:scale(.4);opacity:.3}40%{transform:scale(1.1);opacity:1}}
+.ai-disclaimer{margin:16px 0 0;padding:12px 14px;background:rgba(232,130,12,0.1);border:1px solid rgba(232,130,12,0.3);border-radius:var(--r-sm);font-size:12px;color:#7A4A00;display:flex;gap:8px;line-height:1.6}
+.ai-disclaimer i{color:var(--amber-light);flex-shrink:0;margin-top:1px}
+
+/* ── MY BOOKINGS ── */
+.bk-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:22px;margin-bottom:14px;border-left:4px solid var(--border);transition:all .2s}
+.bk-card.pending{border-left-color:var(--amber)}
+.bk-card.confirmed{border-left-color:var(--mint)}
+.bk-card.cancelled{border-left-color:var(--coral)}
+.bk-card.completed{border-left-color:var(--sky)}
+.bk-card.rescheduled{border-left-color:var(--teal)}
+.bk-card:hover{box-shadow:var(--shadow)}
+.bk-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.bk-doc{font-size:16px;font-weight:800;font-family:'Syne',sans-serif}
+.bk-spec{font-size:12px;color:var(--text-soft);margin-top:2px}
+.status-pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px}
+.status-pill.pending{background:rgba(232,130,12,0.12);color:var(--amber)}
+.status-pill.confirmed{background:rgba(0,200,150,0.12);color:var(--mint)}
+.status-pill.cancelled{background:rgba(232,69,69,0.12);color:var(--coral)}
+.status-pill.completed{background:rgba(33,150,243,0.12);color:var(--sky)}
+.status-pill.rescheduled{background:rgba(11,110,110,0.12);color:var(--teal)}
+.bk-meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:8px}
+.bk-mt{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-soft)}
+.bk-mt i{color:var(--teal-mid);width:14px;text-align:center}
+.bk-problem{margin-top:10px;font-size:13px;color:var(--text-mid);line-height:1.5}
+.bk-note{margin-top:8px;padding:10px 12px;background:var(--amber-pale);border:1px solid rgba(232,130,12,0.2);border-radius:var(--r-sm);font-size:12px;color:#7A4A00}
+.bk-ai-btn{margin-top:8px;padding:9px 12px;background:rgba(11,110,110,0.06);border:1.5px solid rgba(11,110,110,0.15);border-radius:var(--r-sm);font-size:12px;color:var(--teal);font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .2s;width:100%;text-align:left}
+.bk-ai-btn:hover{background:rgba(11,110,110,0.12)}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;background:rgba(10,26,46,0.75);backdrop-filter:blur(8px);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex;animation:fadeIn .2s}
+.modal{background:var(--white);border-radius:24px;width:100%;max-width:450px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.modal-hd{padding:32px 32px 0;text-align:center}
+.modal-hd .mh-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--teal),var(--teal-bright));border-radius:18px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;margin:0 auto 18px;box-shadow:0 8px 20px var(--teal-glow)}
+.modal-hd h2{font-size:26px;font-weight:800;margin-bottom:6px}
+.modal-hd p{font-size:14px;color:var(--text-soft)}
+.modal-tabs{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin:22px 0 0}
+.mt{flex:1;padding:9px;border:none;background:none;border-radius:8px;font-size:14px;font-weight:700;color:var(--text-soft);cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif}
+.mt.on{background:var(--white);color:var(--teal);box-shadow:var(--shadow-sm)}
+.modal-body{padding:20px 32px 32px}
+.mfg{margin-bottom:14px}
+.mfg label{display:block;font-size:12px;font-weight:700;color:var(--text-mid);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px}
+.mfg input,mfg select{background:var(--bg)}
+.m2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal .submit-btn{margin-top:8px}
+.auth-foot{text-align:center;margin-top:14px;font-size:13px;color:var(--text-soft)}
+.auth-foot a{color:var(--teal);font-weight:700;cursor:pointer}
+
+/* ── AI DETAIL MODAL ── */
+.ai-modal-body{padding:24px;max-height:70vh;overflow-y:auto}
+.ai-modal-content{font-size:14px;line-height:1.9;color:#1A2A2A;white-space:pre-wrap;font-weight:400}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{padding:13px 18px;border-radius:12px;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:270px;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
+.toast.success{background:linear-gradient(135deg,#056235,#00C896)}
+.toast.error{background:linear-gradient(135deg,#8B1212,var(--coral))}
+.toast.info{background:linear-gradient(135deg,var(--teal),var(--teal-bright))}
+.toast.warning{background:linear-gradient(135deg,#B05A00,var(--amber))}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(0.96) translateY(-4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(0.75)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── UTILITY ── */
+.hidden{display:none!important}
+.empty-state{text-align:center;padding:56px 20px;color:var(--text-soft)}
+.empty-state i{font-size:44px;margin-bottom:16px;opacity:0.2;display:block}
+.empty-state h3{font-size:18px;font-weight:800;margin-bottom:6px;font-family:'Syne',sans-serif;color:var(--text-mid)}
+
+/* ── ADMIN BAR ── */
+.admin-bar{background:linear-gradient(90deg,var(--navy),#0D3D3D);padding:10px 28px;display:flex;align-items:center;justify-content:space-between;margin-top:72px}
+.admin-bar span{color:rgba(255,255,255,0.7);font-size:13px;display:flex;align-items:center;gap:8px}
+.admin-bar-btn{padding:7px 18px;background:var(--teal-bright);color:var(--navy);border:none;border-radius:8px;font-weight:800;font-size:12px;cursor:pointer;font-family:'Syne',sans-serif}
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE — full rewrite
+═══════════════════════════════════════════════ */
+
+/* Tablet */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;padding:40px 20px 60px}
+  .hero h1{font-size:38px}
+  .hero-card{display:none}
+  .booking-form-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .hero-metrics{gap:20px}
+  .section{padding:48px 20px}
+  .sec-title{font-size:30px}
+  .doc-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+  .booking-area{padding:24px 18px}
+  .notif-panel{width:calc(100vw - 32px);right:16px}
+}
+
+/* Mobile (phones) */
+@media(max-width:480px){
+  /* ── NAV ── */
+  .nav-inner{padding:0 16px;height:60px}
+  .logo-text{font-size:18px}
+  .logo-mark{width:36px;height:36px;font-size:16px;border-radius:10px}
+  .nav-links{display:none}
+  .btn-login{padding:7px 14px;font-size:13px}
+  .btn-cta{padding:7px 14px;font-size:13px}
+  .user-chip span{display:none}
+  .user-dropdown{right:0;min-width:180px}
+  .notif-panel{width:calc(100vw - 24px);right:12px;top:70px}
+
+  /* ── HERO ── */
+  .hero{padding-top:60px;min-height:auto}
+  .hero-inner{padding:32px 16px 48px;gap:24px}
+  .hero h1{font-size:30px;letter-spacing:-0.5px;margin-bottom:14px}
+  .hero-eyebrow{padding:5px 12px;margin-bottom:16px}
+  .hero-eyebrow span{font-size:11px}
+  .hero-desc{font-size:14px;margin-bottom:24px;line-height:1.65}
+  .hero-btns{gap:10px;margin-bottom:28px;flex-direction:column}
+  .btn-hero{padding:13px 22px;font-size:14px;justify-content:center}
+  .hero-metrics{gap:14px;flex-wrap:wrap}
+  .hm{padding-left:14px}.hm-num{font-size:24px}.hm-label{font-size:11px}
+  .hero-card{display:none}
+
+  /* ── OFFERS ── */
+  .offers-strip{padding:28px 16px}
+  .os-head{flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:16px}
+  .os-head h2{font-size:18px}
+  .offer-card{min-width:200px;padding:16px}
+
+  /* ── SECTION / DOCTORS ── */
+  .section{padding:36px 16px}
+  .sec-title{font-size:26px;margin-bottom:8px}
+  .sec-sub{font-size:14px}
+  .doc-grid{grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+  .doc-card{padding:18px 12px}
+  .doc-av{width:60px;height:60px;font-size:22px;margin-bottom:10px}
+  .doc-name{font-size:14px}
+  .doc-spec{font-size:10px}
+  .doc-meta{font-size:11px}
+  .doc-fee{font-size:12px}
+  .doc-avail{font-size:11px}
+
+  /* ── BOOKING AREA ── */
+  .booking-area{padding:18px 14px;border-radius:16px}
+  .dash-tabs{width:100%;margin-bottom:20px}
+  .dtab{flex:1;padding:9px 10px;font-size:12px;justify-content:center;gap:5px}
+  .dtab i{font-size:12px}
+  .booking-form-grid{grid-template-columns:1fr;gap:12px}
+  .fg.full{grid-column:1}
+  input,select,textarea{padding:11px 12px;font-size:14px;border-radius:8px}
+  label{font-size:11px}
+  .submit-btn{padding:13px;font-size:14px}
+
+  /* ── AI BOX ── */
+  .ai-header{padding:16px 16px}
+  .ai-header .ai-av{width:38px;height:38px;font-size:18px}
+  .ai-header-text h3{font-size:14px}
+  .ai-body{padding:16px}
+  .ai-content{font-size:13px;line-height:1.8}
+  .hms-ecg-wrap{width:180px}
+
+  /* ── MY BOOKINGS ── */
+  .bk-card{padding:16px 14px}
+  .bk-doc{font-size:14px}
+  .bk-top{flex-direction:row;align-items:flex-start}
+  .bk-meta{gap:10px}
+  .bk-mt{font-size:12px}
+  .bk-problem{font-size:12px}
+
+  /* ── AUTH MODAL ── */
+  .modal-ov{padding:12px}
+  .modal{border-radius:20px;max-height:90vh;overflow-y:auto}
+  .modal-hd{padding:22px 20px 0}
+  .modal-hd .mh-icon{width:48px;height:48px;font-size:20px;border-radius:14px;margin-bottom:12px}
+  .modal-hd h2{font-size:20px}
+  .modal-body{padding:16px 20px 24px}
+  .mfg{margin-bottom:12px}
+  .m2{grid-template-columns:1fr}
+
+  /* ── TOAST ── */
+  .toast-wrap{bottom:16px;right:12px;left:12px}
+  .toast{min-width:unset;width:100%;font-size:12px;padding:11px 14px}
+
+  /* ── ADMIN BAR ── */
+  .admin-bar{padding:10px 16px;flex-direction:column;gap:8px;text-align:center;margin-top:60px}
+
+  /* ── AI DETAIL MODAL ── */
+  .ai-modal-body{padding:16px;max-height:75vh}
+  .ai-modal-content{font-size:13px}
+
+  /* ── EMPTY STATE ── */
+  .empty-state{padding:36px 16px}
+  .empty-state i{font-size:32px}
+  .empty-state h3{font-size:16px}
+}
+
+/* ══════════════ HOSPITAL LOADER ══════════════ */
+#hmsLoader{
+  position:fixed;inset:0;z-index:99999;background:#07101E;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .5s ease,visibility .5s ease;
+}
+#hmsLoader.hide{opacity:0;visibility:hidden;pointer-events:none}
+.hl-logo{
+  width:80px;height:80px;border-radius:22px;
+  background:linear-gradient(135deg,#0B6E6E,#11B5B5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;color:#fff;margin-bottom:24px;
+  box-shadow:0 8px 32px rgba(17,181,181,0.4);
+  animation:hlPulse 1.5s ease-in-out infinite;
+}
+@keyframes hlPulse{0%,100%{transform:scale(1);box-shadow:0 8px 32px rgba(17,181,181,0.4)}50%{transform:scale(1.06);box-shadow:0 12px 40px rgba(17,181,181,0.65)}}
+.hl-title{font-size:24px;font-weight:800;color:#fff;letter-spacing:-0.5px;margin-bottom:6px;font-family:'Syne',sans-serif}
+.hl-title span{color:#11B5B5}
+.hl-sub{font-size:13px;color:rgba(255,255,255,0.45);margin-bottom:32px;letter-spacing:0.3px}
+.hl-ecg{width:240px;height:48px;position:relative;margin-bottom:28px}
+.hl-ecg svg{width:100%;height:100%;overflow:visible}
+.hl-ecg-path{
+  fill:none;stroke:#11B5B5;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:320;stroke-dashoffset:320;
+  animation:ecgDraw 1.8s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(17,181,181,0.8));
+}
+@keyframes ecgDraw{
+  0%{stroke-dashoffset:320;opacity:1}
+  70%{stroke-dashoffset:0;opacity:1}
+  90%{stroke-dashoffset:0;opacity:0}
+  100%{stroke-dashoffset:320;opacity:0}
+}
+.hl-dots{display:flex;gap:8px}
+.hl-dot{
+  width:8px;height:8px;border-radius:50%;background:#11B5B5;
+  animation:hlDot .9s ease-in-out infinite;
+}
+.hl-dot:nth-child(2){animation-delay:.18s;background:rgba(17,181,181,.7)}
+.hl-dot:nth-child(3){animation-delay:.36s;background:rgba(17,181,181,.4)}
+@keyframes hlDot{0%,80%,100%{transform:scale(0.5);opacity:.4}40%{transform:scale(1.2);opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- ══ HOSPITAL LOADER ══ -->
+<div id="hmsLoader">
+  <div class="hl-logo">🏥</div>
+  <div class="hl-title">Medi<span>Care+</span></div>
+  <div class="hl-sub">Advanced Healthcare System</div>
+  <div class="hl-ecg">
+    <svg viewBox="0 0 240 48" preserveAspectRatio="none">
+      <path class="hl-ecg-path" d="M0,24 L40,24 L52,24 L58,4 L66,44 L74,10 L82,36 L88,24 L100,24 L140,24 L152,24 L158,4 L166,44 L174,10 L182,36 L188,24 L240,24"/>
+    </svg>
+  </div>
+  <div class="hl-dots"><div class="hl-dot"></div><div class="hl-dot"></div><div class="hl-dot"></div></div>
+</div>
+
+
+<!-- ══ NAVBAR ══ -->
+<nav class="nav" id="mainNav">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark"><i class="fas fa-heartbeat"></i></div>
+      <div class="logo-text">Medi<span>Care</span><b>+</b></div>
+    </div>
+    <div class="nav-links">
+      <button class="nav-a active-link" onclick="scrollS('home')">Home</button>
+      <button class="nav-a" onclick="scrollS('doctors')">Doctors</button>
+      <button class="nav-a" onclick="scrollS('book-section')">Book</button>
+      <button class="nav-a" onclick="switchDash('mybookings')">My Appointments</button>
+    </div>
+    <div class="nav-right">
+      <div class="notif-wrap hidden" id="notifWrap">
+        <button class="notif-btn" onclick="toggleNotif()"><i class="fas fa-bell"></i></button>
+        <span class="notif-dot hidden" id="notifDot">0</span>
+      </div>
+      <button class="btn-login hidden" id="loginNavBtn" onclick="openModal()">Login</button>
+      <button class="btn-cta hidden" id="loginNavBtn2" onclick="openModal()"><i class="fas fa-user-plus"></i> Register</button>
+      <div class="user-chip-wrap hidden" id="userChip">
+        <div class="user-chip" id="userChipBtn" onclick="toggleUserMenu()" role="button" aria-haspopup="true">
+          <div class="user-chip-av" id="userInitial">U</div>
+          <span id="userName">User</span>
+          <i class="fas fa-chevron-down chip-arrow"></i>
+        </div>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="ud-info">
+            <div class="ud-name" id="udName">—</div>
+            <div class="ud-email" id="udEmail">—</div>
+          </div>
+          <button class="ud-item" onclick="switchDash('mybookings');closeUserMenu()"><i class="fas fa-calendar-check" style="color:var(--teal)"></i> My Appointments</button>
+          <div class="ud-divider"></div>
+          <button class="ud-item logout" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ NOTIFICATION PANEL ══ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="np-head">
+    <h3><i class="fas fa-bell" style="color:var(--teal);margin-right:6px"></i>Notifications</h3>
+    <button class="np-read-all" onclick="markAllRead()">Mark all read</button>
+  </div>
+  <div class="np-list" id="npList">
+    <div class="np-empty"><i class="fas fa-bell-slash"></i><p>No notifications yet</p></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN BAR ══ -->
+<div class="admin-bar hidden" id="adminBar">
+  <span><i class="fas fa-shield-alt" style="color:var(--teal-bright)"></i>Logged in as <strong style="color:var(--teal-bright)">Administrator</strong> — Limited view</span>
+  <a href="admin.html"><button class="admin-bar-btn"><i class="fas fa-tachometer-alt"></i> Open Full Admin Panel</button></a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="home" style="scroll-margin-top:72px">
+<div class="hero">
+  <div class="hero-mesh"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow"><span class="pulse"></span><span>Trusted Since 1998 · 25+ Years of Care</span></div>
+      <h1>Advanced Healthcare<br>Built Around <em>You</em></h1>
+      <p class="hero-desc">MediCare+ delivers world-class medical expertise with compassionate care. Book appointments, get AI-powered home remedies, and stay connected with your doctors — all in one place.</p>
+      <div class="hero-btns">
+        <button class="btn-hero primary" onclick="scrollS('book-section')"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
+        <button class="btn-hero sec" onclick="scrollS('doctors')"><i class="fas fa-user-md"></i> Our Doctors</button>
+      </div>
+      <div class="hero-metrics">
+        <div class="hm"><div class="hm-num">200+</div><div class="hm-label">Specialists</div></div>
+        <div class="hm"><div class="hm-num">50K+</div><div class="hm-label">Patients</div></div>
+        <div class="hm"><div class="hm-num">24/7</div><div class="hm-label">Emergency</div></div>
+        <div class="hm"><div class="hm-num">98%</div><div class="hm-label">Satisfaction</div></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <div class="hc-title">Our Specialties</div>
+      <div class="spec-grid">
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(232,69,69,0.15)">❤️</div><span class="sn">Cardiology</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(33,150,243,0.15)">🧠</div><span class="sn">Neurology</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(255,152,0,0.15)">🦴</div><span class="sn">Orthopedics</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(0,200,150,0.15)">👶</div><span class="sn">Pediatrics</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(156,39,176,0.15)">👁</div><span class="sn">Ophthalmology</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(232,130,12,0.15)">🦷</div><span class="sn">Dentistry</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(233,30,99,0.15)">🌸</div><span class="sn">Gynecology</span></div>
+        <div class="spec-chip" onclick="scrollS('doctors')"><div class="si" style="background:rgba(0,188,212,0.15)">🫁</div><span class="sn">Pulmonology</span></div>
+      </div>
+      <div class="hc-ai">
+        <div class="ai-ic">🤖</div>
+        <p><strong>Gemini AI</strong> analyzes your symptoms and gives personalized home remedy suggestions while you wait for your appointment.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ OFFERS ══ -->
+<div class="offers-strip" id="offersSection" style="display:none">
+  <div class="os-inner">
+    <div class="os-head">
+      <h2><i class="fas fa-tags"></i> Special Offers & Health Packages</h2>
+    </div>
+    <div class="offers-scroll" id="offersContainer"></div>
+  </div>
+</div>
+
+<!-- ══ DOCTORS ══ -->
+<section id="doctors" class="section" style="background:#fff;scroll-margin-top:72px">
+  <div class="sec-inner">
+    <div class="sec-eyebrow">Medical Team</div>
+    <h2 class="sec-title">Meet Our Expert Doctors</h2>
+    <p class="sec-sub">Board-certified specialists bringing decades of experience to deliver the best care for you and your family.</p>
+    <div class="doc-grid" id="docGrid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-soft)"><div class="spinner" style="margin:0 auto 10px;border-top-color:var(--teal)"></div>Loading...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BOOKING + MY BOOKINGS ══ -->
+<section id="book-section" class="section" style="scroll-margin-top:72px">
+  <div class="sec-inner">
+    <div class="dash-tabs">
+      <button class="dtab on" id="tabBook" onclick="switchDash('book')"><i class="fas fa-calendar-plus"></i> Book Appointment</button>
+      <button class="dtab" id="tabMy" onclick="switchDash('mybookings')"><i class="fas fa-list-ul"></i> My Appointments</button>
+    </div>
+
+    <!-- Book panel -->
+    <div id="panelBook">
+      <div class="sec-eyebrow" style="margin-bottom:12px">Appointment</div>
+      <h2 class="sec-title" style="font-size:30px;margin-bottom:28px">Book Your Appointment</h2>
+      <div class="booking-area">
+        <div class="auth-gate hidden" id="authGate">
+          <div class="lock-ic"><i class="fas fa-lock"></i></div>
+          <h3>Please Login First</h3>
+          <p>Create an account or login to book appointments and access AI-powered home remedy suggestions.</p>
+          <button class="btn-cta" onclick="openModal()" style="border:none;padding:13px 28px;font-size:15px"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+        </div>
+        <form id="bookForm" class="hidden" onsubmit="submitBooking(event)">
+          <div class="booking-form-grid">
+            <div class="fg"><label><i class="fas fa-user"></i> Patient Name</label><input type="text" id="bName" placeholder="Full name" required/></div>
+            <div class="fg"><label><i class="fas fa-birthday-cake"></i> Age</label><input type="number" id="bAge" placeholder="Age in years" min="1" max="120" required/></div>
+            <div class="fg full"><label><i class="fas fa-user-md"></i> Select Doctor</label>
+              <select id="bDoctor" required onchange="onDoctorChange()">
+                <option value="">– Choose a Doctor –</option>
+              </select>
+            </div>
+            <div class="fg"><label><i class="fas fa-calendar"></i> Appointment Date</label><input type="date" id="bDate" required/></div>
+            <div class="fg"><label><i class="fas fa-clock"></i> Preferred Time</label><input type="time" id="bTime" required/></div>
+            <div class="fg full">
+              <label><i class="fas fa-stethoscope"></i> Describe Your Problem</label>
+              <textarea id="bProblem" placeholder="Describe your symptoms in detail — how long you've had them, severity, what makes it better or worse..." required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="submit-btn" id="submitBtn"><i class="fas fa-calendar-check"></i> Confirm Booking & Get AI Home Remedies</button>
+        </form>
+        <!-- AI Suggestion -->
+        <div class="ai-box" id="aiBox">
+          <div class="ai-header">
+            <div class="ai-av">🤖</div>
+            <div class="ai-header-text"><h3>AI Home Remedy Suggestions</h3><p>Powered by Gemini 2.5 Flash · Home remedies only, no medicines</p></div>
+          </div>
+          <div class="ai-body">
+            <div id="aiContent"></div>
+            <div class="ai-disclaimer"><i class="fas fa-exclamation-triangle"></i>These are general home remedies for temporary relief only. No medicines are suggested. Always follow your doctor's professional advice. Contact emergency services if symptoms are severe.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Bookings panel -->
+    <div id="panelMy" class="hidden">
+      <div class="sec-eyebrow" style="margin-bottom:12px">Records</div>
+      <h2 class="sec-title" style="font-size:30px;margin-bottom:28px">My Appointments</h2>
+      <div id="myBookingsList">
+        <div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No appointments yet</h3><p>Book your first appointment above.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="modal-ov" id="authModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="mh-icon"><i class="fas fa-heartbeat"></i></div>
+      <h2 id="mTitle">Welcome Back</h2>
+      <p id="mSub">Login to your MediCare+ account</p>
+      <div class="modal-tabs">
+        <button class="mt on" id="mlTab" onclick="switchAuthTab('login')">Login</button>
+        <button class="mt" id="mrTab" onclick="switchAuthTab('register')">Register</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <!-- Login -->
+      <div id="loginForm">
+        <div class="mfg"><label>Email / Admin ID</label><input type="text" id="lEmail" placeholder="email@example.com or admin@123"/></div>
+        <div class="mfg"><label>Password</label><input type="password" id="lPass" placeholder="Your password"/></div>
+        <button class="submit-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <p class="auth-foot">No account? <a onclick="switchAuthTab('register')">Register here</a></p>
+      </div>
+      <!-- Register -->
+      <div id="regForm" class="hidden">
+        <div class="m2">
+          <div class="mfg"><label>Full Name</label><input type="text" id="rName" placeholder="Your full name"/></div>
+          <div class="mfg"><label>Age</label><input type="number" id="rAge" placeholder="Age" min="1"/></div>
+        </div>
+        <div class="mfg"><label>Email</label><input type="email" id="rEmail" placeholder="your@email.com"/></div>
+        <div class="mfg"><label>Phone</label><input type="tel" id="rPhone" placeholder="Mobile number"/></div>
+        <div class="m2">
+          <div class="mfg"><label>Password</label><input type="password" id="rPass" placeholder="Min 6 characters"/></div>
+          <div class="mfg"><label>Blood Group</label>
+            <select id="rBlood">
+              <option value="">Select</option>
+              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+              <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" onclick="doRegister()"><i class="fas fa-user-plus"></i> Create Account</button>
+        <p class="auth-foot">Have an account? <a onclick="switchAuthTab('login')">Login here</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI DETAIL MODAL ══ -->
+<div class="modal-ov" id="aiModal">
+  <div class="modal" style="max-width:600px">
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <h3 style="font-size:16px;display:flex;align-items:center;gap:8px"><span>🤖</span> AI Home Remedy Suggestions</h3>
+      <button onclick="closeAiModal()" style="border:none;background:none;font-size:20px;cursor:pointer;color:var(--text-soft)">×</button>
+    </div>
+    <div class="ai-modal-body">
+      <div class="ai-modal-content" id="aiModalContent"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const BACKEND_URL = "https://hospital-management-system-6exp.onrender.com"; // v4 // ← UPDATE THIS
+
+let token = localStorage.getItem("hms_token");
+let currentUser = null;
+let doctorsData = [];
+let notifOpen = false;
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded", async () => {
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("bDate").min = today;
+  window.addEventListener("scroll", () => {
+    document.getElementById("mainNav").classList.toggle("scrolled", window.scrollY > 20);
+  });
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#notifPanel") && !e.target.closest("#notifWrap")) closeNotif();
+    if (!e.target.closest("#userChip")) closeUserMenu();
+    if (e.target === document.getElementById("authModal")) closeModal();
+    if (e.target === document.getElementById("aiModal")) closeAiModal();
+  });
+  if (token) { await initUser(); setTimeout(restoreLastAI, 200); }
+  else showGuestUI();
+  loadDoctors();
+  loadOffers();
+});
+
+// ── USER SESSION ──────────────────────────────────────────────────
+async function initUser() {
+  try {
+    currentUser = await api("/api/auth/me");
+    showLoggedUI();
+    if (currentUser.is_admin) document.getElementById("adminBar").classList.remove("hidden");
+    loadNotifications();
+  } catch { localStorage.removeItem("hms_token"); token = null; showGuestUI(); }
+}
+
+function showGuestUI() {
+  ["loginNavBtn","loginNavBtn2"].forEach(id => document.getElementById(id).classList.remove("hidden"));
+  ["userChip","notifWrap","adminBar"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  document.getElementById("authGate").classList.remove("hidden");
+  document.getElementById("bookForm").classList.add("hidden");
+}
+
+function showLoggedUI() {
+  ["loginNavBtn","loginNavBtn2"].forEach(id => document.getElementById(id).classList.add("hidden"));
+  ["userChip","notifWrap"].forEach(id => document.getElementById(id).classList.remove("hidden"));
+  document.getElementById("userInitial").textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById("userName").textContent = currentUser.name.split(" ")[0];
+  document.getElementById("udName").textContent = currentUser.name;
+  document.getElementById("udEmail").textContent = currentUser.email || "";
+  document.getElementById("authGate").classList.add("hidden");
+  document.getElementById("bookForm").classList.remove("hidden");
+  document.getElementById("bName").value = currentUser.name;
+  populateDoctorSelect();
+  if (currentUser.is_admin) document.getElementById("adminBar").classList.remove("hidden");
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById("lEmail").value.trim();
+  const pass = document.getElementById("lPass").value;
+  if (!email || !pass) { toast("Enter email and password","error"); return; }
+  try {
+    const r = await api("/api/auth/login","POST",{email,password:pass});
+    token = r.token; currentUser = r.user;
+    localStorage.setItem("hms_token", token);
+    closeModal(); showLoggedUI();
+    toast(`Welcome back, ${currentUser.name}! 👋`,"success");
+    loadNotifications();
+  } catch(e){ toast(e.message||"Login failed","error"); }
+}
+
+async function doRegister() {
+  const name = document.getElementById("rName").value.trim();
+  const email = document.getElementById("rEmail").value.trim();
+  const pass = document.getElementById("rPass").value;
+  if (!name||!email||!pass){ toast("Fill required fields","error"); return; }
+  if (pass.length < 6){ toast("Password must be 6+ characters","error"); return; }
+  try {
+    const r = await api("/api/auth/register","POST",{
+      name, email, password:pass,
+      phone: document.getElementById("rPhone").value,
+      age: document.getElementById("rAge").value,
+      blood_group: document.getElementById("rBlood").value
+    });
+    token = r.token; currentUser = r.user;
+    localStorage.setItem("hms_token", token);
+    closeModal(); showLoggedUI();
+    toast(`Welcome to MediCare+, ${name}! 🎉`,"success");
+    loadNotifications();
+  } catch(e){ toast(e.message||"Registration failed","error"); }
+}
+
+function toggleUserMenu() {
+  const btn = document.getElementById("userChipBtn");
+  const dd  = document.getElementById("userDropdown");
+  const isOpen = dd.classList.contains("open");
+  if (isOpen) { dd.classList.remove("open"); btn.classList.remove("open"); }
+  else         { dd.classList.add("open");    btn.classList.add("open"); }
+}
+function closeUserMenu() {
+  document.getElementById("userDropdown")?.classList.remove("open");
+  document.getElementById("userChipBtn")?.classList.remove("open");
+}
+
+function doLogout() {
+  localStorage.removeItem("hms_token");
+  token = null; currentUser = null;
+  showGuestUI(); toast("Logged out","info");
+}
+
+// ── DOCTORS ──────────────────────────────────────────────────────
+async function loadOffers() {
+  try {
+    const offers = await api("/api/offers");
+    const section = document.getElementById("offersSection");
+    const container = document.getElementById("offersContainer");
+    if (!offers || !offers.length) { section.style.display="none"; return; }
+    section.style.display = "block";
+    container.innerHTML = offers.map(o => `
+      <div class="offer-card">
+        <div class="offer-tag">${o.tag}</div>
+        <h3>${o.title}</h3>
+        <p>${o.description}</p>
+        <div class="offer-pct">${o.value}</div>
+      </div>
+    `).join("");
+  } catch {
+    // If API fails, keep section hidden (no hardcoded fallback needed)
+    document.getElementById("offersSection").style.display = "none";
+  }
+}
+
+async function loadDoctors() {
+  try {
+    doctorsData = await api("/api/doctors");
+    renderDoctors();
+    populateDoctorSelect();
+  } catch {
+    document.getElementById("docGrid").innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--text-soft)"><i class="fas fa-exclamation-circle"></i> Could not load doctors</div>`;
+  }
+}
+
+function renderDoctors() {
+  const g = document.getElementById("docGrid");
+  if (!doctorsData.length) { g.innerHTML = `<div style="grid-column:1/-1" class="empty-state"><i class="fas fa-user-md"></i><h3>No doctors yet</h3></div>`; return; }
+  g.innerHTML = doctorsData.map(d => `
+    <div class="doc-card" onclick="pickDoctor('${d.id}')">
+      <div class="doc-av"><i class="fas fa-user-md"></i></div>
+      <div class="doc-name">Dr. ${d.name}</div>
+      <div class="doc-spec">${d.specialization}</div>
+      <div class="doc-meta">${d.qualification||''} · ${d.experience||0} yrs</div>
+      <div class="doc-avail ${d.is_available_today!==false?'yes':'no'}">
+        <span class="d"></span>${d.is_available_today!==false?'Available Today':'Unavailable Today'}
+      </div>
+      <div class="doc-fee"><i class="fas fa-rupee-sign"></i> ${d.consultation_fee||500} / visit</div>
+    </div>
+  `).join("");
+}
+
+function populateDoctorSelect() {
+  const sel = document.getElementById("bDoctor");
+  if (!sel || !doctorsData.length) return;
+  const cur = sel.value;
+  sel.innerHTML = `<option value="">– Choose a Doctor –</option>`;
+  doctorsData.forEach(d => {
+    const o = document.createElement("option");
+    o.value = d.id; o.textContent = `Dr. ${d.name} — ${d.specialization}`;
+    o.dataset.name = d.name; o.dataset.spec = d.specialization;
+    sel.appendChild(o);
+  });
+  if (cur) sel.value = cur;
+}
+
+function onDoctorChange() {}
+
+function pickDoctor(id) {
+  scrollS("book-section");
+  switchDash("book");
+  setTimeout(() => { document.getElementById("bDoctor").value = id; }, 300);
+}
+
+// ── BOOKING ──────────────────────────────────────────────────────
+async function submitBooking(e) {
+  e.preventDefault();
+  if (!currentUser) { openModal(); return; }
+  const sel = document.getElementById("bDoctor");
+  const opt = sel.options[sel.selectedIndex];
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true; btn.innerHTML = `<div class="spinner"></div> Booking...`;
+  try {
+    await api("/api/bookings","POST",{
+      doctor_id: sel.value, doctor_name: opt?.dataset?.name||"",
+      specialization: opt?.dataset?.spec||"",
+      patient_name: document.getElementById("bName").value,
+      patient_age: document.getElementById("bAge").value,
+      problem: document.getElementById("bProblem").value,
+      appointment_date: document.getElementById("bDate").value,
+      appointment_time: document.getElementById("bTime").value
+    });
+    toast("Appointment booked! Fetching AI suggestions...","success");
+    getAISuggestion(
+      document.getElementById("bProblem").value,
+      document.getElementById("bAge").value,
+      document.getElementById("bName").value
+    );
+    loadNotifications();
+    document.getElementById("bookForm").reset();
+    document.getElementById("bName").value = currentUser.name;
+  } catch(e){ toast(e.message||"Booking failed","error"); btn.disabled=false; btn.innerHTML=`<i class="fas fa-calendar-check"></i> Confirm Booking & Get AI Home Remedies`; }
+}
+
+// ── AI ────────────────────────────────────────────────────────────
+async function getAISuggestion(problem, age, name) {
+  const box = document.getElementById("aiBox");
+  const content = document.getElementById("aiContent");
+  box.classList.add("show");
+  content.innerHTML = `
+    <div class="ai-loading">
+      <div class="hms-pulse-wrap">
+        <div class="hms-pulse-icon">🤖</div>
+        <div class="hms-ecg-wrap">
+          <svg viewBox="0 0 220 40" preserveAspectRatio="none">
+            <path class="hms-ecg-line" d="M0,20 L34,20 L46,20 L52,3 L60,38 L68,7 L76,32 L82,20 L110,20 L122,20 L128,3 L136,38 L144,7 L152,32 L158,20 L220,20"/>
+          </svg>
+        </div>
+        <div class="hms-loading-text">Analyzing your symptoms<span class="hms-loading-dots"><span></span><span></span><span></span></span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px">Gemini AI · Home remedies only</div>
+      </div>
+    </div>`;
+  box.scrollIntoView({behavior:"smooth",block:"nearest"});
+  try {
+    const r = await api("/api/ai/suggest","POST",{problem, patient_age:age, patient_name:name});
+    const src = r.source==="fallback" ? 
+      `<div style="margin-top:10px;padding:8px 12px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:6px;font-size:11px;color:rgba(255,200,100,0.85)"><i class="fas fa-exclamation-circle"></i> AI unavailable — showing saved home remedies. Your doctor will provide full advice.</div>` :
+      `<div style="font-size:10px;color:rgba(17,181,181,0.5);text-align:right;margin-top:8px"><i class="fas fa-robot"></i> Gemini 2.5 Flash</div>`;
+    content.innerHTML = fmtAI(r.suggestion) + src;
+    // Cache last AI suggestion so it survives navigation
+    const aiKey = "hms_last_ai_" + (currentUser?.id||"");
+    localStorage.setItem(aiKey, JSON.stringify({suggestion:r.suggestion, problem, time: new Date().toISOString()}));
+    document.getElementById("submitBtn").disabled=false;
+    document.getElementById("submitBtn").innerHTML=`<i class="fas fa-calendar-check"></i> Confirm Booking & Get AI Home Remedies`;
+  } catch(e){
+    content.innerHTML = `<div style="color:#FF9E9E;font-size:14px;font-weight:500"><i class="fas fa-exclamation-circle"></i> ${e.message||"AI unavailable. Admin needs to set Gemini API key."}</div>`;
+    document.getElementById("submitBtn").disabled=false;
+    document.getElementById("submitBtn").innerHTML=`<i class="fas fa-calendar-check"></i> Confirm Booking & Get AI Home Remedies`;
+  }
+}
+
+// Restore last AI suggestion if user navigates back
+function restoreLastAI() {
+  const aiKey = "hms_last_ai_" + (currentUser?.id||"");
+  const cached = localStorage.getItem(aiKey);
+  if (!cached) return;
+  try {
+    const {suggestion, problem, time} = JSON.parse(cached);
+    const minsAgo = Math.floor((Date.now()-new Date(time).getTime())/60000);
+    if (minsAgo > 120) return; // don't restore if > 2 hrs old
+    const box = document.getElementById("aiBox");
+    const content = document.getElementById("aiContent");
+    box.classList.add("show");
+    content.innerHTML = fmtAI(suggestion) + `<div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.35);border-top:1px solid rgba(255,255,255,0.07);padding-top:10px"><i class="fas fa-history"></i> From your last booking · ${minsAgo < 1 ? "just now" : minsAgo+"m ago"}</div>`;
+  } catch {}
+}
+
+function fmtAI(text) {
+  return text.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/\*(.*?)\*/g,"<em>$1</em>").replace(/\n/g,"<br/>");
+}
+
+// ── MY BOOKINGS ──────────────────────────────────────────────────
+function renderBookingCards(data) {
+  const c = document.getElementById("myBookingsList");
+  if (!data.length) { c.innerHTML = `<div class="empty-state"><i class="fas fa-calendar-times"></i><h3>No appointments yet</h3><p>Book your first appointment above.</p></div>`; return; }
+  c.innerHTML = data.map(b => `
+    <div class="bk-card ${b.status}">
+      <div class="bk-top">
+        <div><div class="bk-doc">Dr. ${b.doctor_name}</div><div class="bk-spec">${b.specialization}</div></div>
+        <span class="status-pill ${b.status}">${b.status}</span>
+      </div>
+      <div class="bk-meta">
+        <div class="bk-mt"><i class="fas fa-calendar"></i>${b.appointment_date}</div>
+        <div class="bk-mt"><i class="fas fa-clock"></i>${b.appointment_time}</div>
+        <div class="bk-mt"><i class="fas fa-user"></i>${b.patient_name}, ${b.patient_age||'?'} yrs</div>
+      </div>
+      <div class="bk-problem"><i class="fas fa-stethoscope" style="color:var(--teal-mid);margin-right:6px"></i>${b.problem}</div>
+      ${b.admin_notes?`<div class="bk-note"><i class="fas fa-comment-medical" style="margin-right:6px"></i><strong>Doctor's Note:</strong> ${b.admin_notes}</div>`:""}
+      ${b.ai_suggestion?`<button class="bk-ai-btn" onclick='showAiModal(${JSON.stringify(b.ai_suggestion).replace(/'/g,"&#39;")})'><i class="fas fa-robot"></i> View AI Home Remedy Suggestions <i class="fas fa-chevron-right" style="margin-left:auto"></i></button>`:""}
+    </div>
+  `).join("");
+}
+
+async function loadMyBookings() {
+  const c = document.getElementById("myBookingsList");
+  // Show cached data instantly if available
+  const cacheKey = "hms_bookings_" + (currentUser?.id||"");
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const cachedData = JSON.parse(cached);
+      renderBookingCards(cachedData);
+      // Show refresh indicator in corner
+      const ref = document.createElement("div");
+      ref.style.cssText = "font-size:11px;color:var(--text-soft);text-align:right;padding:4px 0 8px;display:flex;align-items:center;justify-content:flex-end;gap:5px";
+      ref.innerHTML = `<div class="spinner" style="width:12px;height:12px;border-width:1.5px;border-top-color:var(--teal-mid)"></div> Refreshing...`;
+      c.insertAdjacentElement("afterend", ref);
+      setTimeout(()=>ref.remove(), 3000);
+    } catch {}
+  } else {
+    c.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-soft)"><div class="spinner" style="margin:0 auto 10px;border-top-color:var(--teal)"></div>Loading appointments...</div>`;
+  }
+  try {
+    const data = await api("/api/bookings");
+    // Save to localStorage for instant load next time
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    renderBookingCards(data);
+  } catch(err) {
+    if (!cached) c.innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Failed to load</h3><p>Check your connection and try again.</p></div>`;
+  }
+}
+
+function showAiModal(sug) {
+  document.getElementById("aiModalContent").innerHTML = fmtAI(sug);
+  document.getElementById("aiModal").classList.add("open");
+}
+function closeAiModal() { document.getElementById("aiModal").classList.remove("open"); }
+
+// ── NOTIFICATIONS ─────────────────────────────────────────────────
+async function loadNotifications() {
+  if (!token) return;
+  try {
+    const notifs = await api("/api/notifications");
+    const unread = notifs.filter(n => !n.is_read).length;
+    const dot = document.getElementById("notifDot");
+    if (unread) { dot.classList.remove("hidden"); dot.textContent = unread > 9 ? "9+" : unread; }
+    else dot.classList.add("hidden");
+    renderNotifs(notifs);
+  } catch {}
+}
+
+function renderNotifs(notifs) {
+  const list = document.getElementById("npList");
+  if (!notifs.length) { list.innerHTML = `<div class="np-empty"><i class="fas fa-bell-slash"></i><p>No notifications</p></div>`; return; }
+  list.innerHTML = notifs.slice(0,20).map(n => `
+    <div class="np-item ${!n.is_read?'unread':''}" onclick="readNotif('${n.id}')">
+      <div class="np-icon ${n.type||'announcement'}">${n.type==='booking'?'📋':n.type==='appointment_update'?'📅':n.type==='offer'?'🏷️':'📢'}</div>
+      <div class="np-text">
+        <div class="title">${n.title}</div>
+        <div class="msg">${n.message}</div>
+        <div class="time">${timeAgo(n.created_at)}</div>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function readNotif(id) { try { await api(`/api/notifications/${id}/read`,"PATCH"); loadNotifications(); } catch {} }
+async function markAllRead() {
+  try {
+    const notifs = await api("/api/notifications");
+    await Promise.all(notifs.filter(n=>!n.is_read).map(n=>api(`/api/notifications/${n.id}/read`,"PATCH")));
+    loadNotifications();
+  } catch {}
+}
+function toggleNotif() { notifOpen=!notifOpen; document.getElementById("notifPanel").classList.toggle("open",notifOpen); if(notifOpen) loadNotifications(); }
+function closeNotif() { notifOpen=false; document.getElementById("notifPanel").classList.remove("open"); }
+
+// ── TABS ──────────────────────────────────────────────────────────
+function switchDash(tab) {
+  const isBook = tab === "book";
+  document.getElementById("panelBook").classList.toggle("hidden",!isBook);
+  document.getElementById("panelMy").classList.toggle("hidden",isBook);
+  document.getElementById("tabBook").classList.toggle("on",isBook);
+  document.getElementById("tabMy").classList.toggle("on",!isBook);
+  if (!isBook) loadMyBookings();
+  if (isBook) setTimeout(restoreLastAI, 100);
+  scrollS("book-section");
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────
+function openModal() { document.getElementById("authModal").classList.add("open"); }
+function closeModal() { document.getElementById("authModal").classList.remove("open"); }
+function switchAuthTab(t) {
+  const isL = t==="login";
+  document.getElementById("loginForm").classList.toggle("hidden",!isL);
+  document.getElementById("regForm").classList.toggle("hidden",isL);
+  document.getElementById("mlTab").classList.toggle("on",isL);
+  document.getElementById("mrTab").classList.toggle("on",!isL);
+  document.getElementById("mTitle").textContent = isL ? "Welcome Back" : "Create Account";
+  document.getElementById("mSub").textContent = isL ? "Login to your MediCare+ account" : "Join MediCare+ for better care";
+}
+
+// ── API ───────────────────────────────────────────────────────────
+async function api(path, method="GET", body=null) {
+  const opts = { method, headers: {"Content-Type":"application/json"} };
+  if (token) opts.headers["Authorization"] = `Bearer ${token}`;
+  if (body) opts.body = JSON.stringify(body);
+  let res, text;
+  try { res = await fetch(`${BACKEND_URL}${path}`, opts); text = await res.text(); }
+  catch(e) { throw new Error("Network error: " + e.message + ". Check BACKEND_URL."); }
+  let data;
+  try { data = JSON.parse(text); }
+  catch { throw new Error('Server returned HTML not JSON. Fix BACKEND_URL in user.html to your actual Render URL.'); }
+  if (!res.ok) throw new Error(data.error || "Request failed (" + res.status + ")");
+  return data;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function toast(msg, type="info") {
+  const icons = {success:"fa-check-circle",error:"fa-times-circle",info:"fa-info-circle",warning:"fa-exclamation-circle"};
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fas ${icons[type]}"></i>${msg}`;
+  document.getElementById("toastWrap").appendChild(el);
+  setTimeout(()=>el.remove(), 4200);
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function scrollS(id) { const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:"smooth"}); }
+function timeAgo(d) {
+  if (!d) return "";
+  const diff = Date.now()-new Date(d).getTime(), m=Math.floor(diff/60000);
+  if (m<1) return "Just now"; if (m<60) return `${m}m ago`;
+  const h=Math.floor(m/60); if (h<24) return `${h}h ago`;
+  return `${Math.floor(h/24)}d ago`;
+}
+
+// ── HOSPITAL LOADER ────────────────────────────────────────────────
+(function() {
+  window.addEventListener("load", function() {
+    setTimeout(function() {
+      const l = document.getElementById("hmsLoader");
+      if (l) l.classList.add("hide");
+    }, 1200);
+  });
+  // Failsafe: hide after 3s regardless
+  setTimeout(function() {
+    const l = document.getElementById("hmsLoader");
+    if (l) l.classList.add("hide");
+  }, 3000);
+})();
+</script>
+</body>
+</html>
